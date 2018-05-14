@@ -35,17 +35,15 @@ public class FilesReader {
 	public Map<String,Long> getFilesList(File node){
 		Map<String,Long> files=new HashMap<String,Long>();
 		String fp=node.getAbsolutePath();
-		System.out.println(fp);
-		System.out.println(path);
 		int i=fp.indexOf(path);
 		String relativePath=fp.substring(path.length());
-		System.out.println("  "+relativePath);
-		files.put(relativePath,node.length());
 		if(node.isDirectory()){
 			String[] subNote = node.list();
 			for(String filename : subNote){
-				getFilesList(new File(node, filename));
+				files.putAll(getFilesList(new File(node, filename)));
 			}
+		}else{
+			files.put(relativePath,node.length());
 		}
 
 		return files;
