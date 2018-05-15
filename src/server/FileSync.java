@@ -41,7 +41,7 @@ public class FileSync extends Thread {
 	public void run() {
 		DataOutputStream dos = new DataOutputStream(outputStream);
 		DataInputStream dis = new DataInputStream(inputStream);
-		while (true) {
+		//while (true) {
 			try {
 				String date = dis.readUTF();
 				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy - hh:mm:ss");
@@ -73,8 +73,8 @@ public class FileSync extends Thread {
 						    Date lastMod= dateFormat.parse(format);
 						    if(lm.after(lastSync)){
 						    	toSendFiles.put(filePath, 1);
-						    	serverfiles.remove(filePath);
 						    }
+					    	serverfiles.remove(filePath);
 						}
 					}else{
 						toSendFiles.put(filePath, 2);
@@ -86,11 +86,13 @@ public class FileSync extends Thread {
 				toSendFiles.size();
 				System.out.println(toSendFiles);
 				sendResultToClient(dos, toSendFiles);
+				dos.close();
+				dis.close();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+		//}
 
 	}
 	
@@ -100,6 +102,7 @@ public class FileSync extends Thread {
 			dos.writeUTF(file.getKey());
 			dos.flush();
 			Integer i=file.getValue();
+			dos.writeInt(i);
 			if(i==1){
 				sendFile(dos,file.getKey());
 			}

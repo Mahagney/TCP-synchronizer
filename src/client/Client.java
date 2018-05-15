@@ -18,6 +18,7 @@ import utils.FilesReader;
 
 public class Client extends Thread{
 	Socket cs;
+	private String pathToDir="C:\\Users\\Mahag\\workspace\\TCP-synchronizer\\src\\resources\\client";
 	OutputStream outputStream;
 	InputStream inputStream;
 	Date lastSync;
@@ -27,7 +28,7 @@ public class Client extends Thread{
 		InetSocketAddress sa=new InetSocketAddress("127.0.0.1",9999);
 		simpleDateFormat = new SimpleDateFormat( "dd/MM/yyyy - hh:mm:ss" );
 		try {
-			lastSync=simpleDateFormat.parse( "20/01/2006 - 00:00:00" );
+			lastSync=simpleDateFormat.parse( "15/05/2018 - 00:00:00" );
 			cs.connect(sa);
 			outputStream = cs.getOutputStream();
 			inputStream = cs.getInputStream();
@@ -45,7 +46,7 @@ public class Client extends Thread{
 			DataInputStream dis=
 					new DataInputStream(inputStream);
 			
-			FilesReader fr=new FilesReader("C:\\Users\\Mahag\\workspace\\TCP-synchronizer\\src\\resources\\client");
+			FilesReader fr=new FilesReader(pathToDir);
 			Map<String,Long> files=fr.getFilesList();
 			System.out.println(simpleDateFormat.format(lastSync));
 			dos.writeUTF(simpleDateFormat.format(lastSync));
@@ -58,6 +59,8 @@ public class Client extends Thread{
 				
 			}
 			receiveFiles(dis);
+			dos.close();
+			dis.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.print("exceptie client");
@@ -72,11 +75,12 @@ public class Client extends Thread{
 		for(i=0;i<n;i++){
 			String path = dis.readUTF();
 			int action = dis.readInt();
+			System.out.println(path +"\n"+action);
 			if(action==1){
 				receiveFile(dis,path);
 			}else{
-				File file = new File(path);
-				file.delete();
+				File file = new File(pathToDir+path);
+				System.out.println(file.getAbsolutePath()+action+" file was deleted "+file.delete());
 			}
 		}
 		
