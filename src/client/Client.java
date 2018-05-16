@@ -3,6 +3,7 @@ package client;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -58,7 +59,7 @@ public class Client extends Thread{
 				dos.writeLong(file.getValue());
 				
 			}
-			receiveFiles(dis);
+			receiveFiles(dis,dos);
 			dos.close();
 			dis.close();
 		} catch (IOException e) {
@@ -69,7 +70,7 @@ public class Client extends Thread{
     	
     }
     
-	private void receiveFiles(DataInputStream dis) throws IOException {
+	private void receiveFiles(DataInputStream dis, DataOutputStream dos) throws IOException {
 		int n = dis.readInt();
 		int i;
 		for(i=0;i<n;i++){
@@ -77,7 +78,7 @@ public class Client extends Thread{
 			int action = dis.readInt();
 			System.out.println(path +"\n"+action);
 			if(action==1){
-				receiveFile(dis,path);
+				receiveFile(dis,dos,pathToDir+path);
 			}else{
 				File file = new File(pathToDir+path);
 				System.out.println(file.getAbsolutePath()+action+" file was deleted "+file.delete());
@@ -85,8 +86,29 @@ public class Client extends Thread{
 		}
 		
 	}
-	private void receiveFile(DataInputStream dis, String path) {
+	private void receiveFile(DataInputStream dis,DataOutputStream dos, String path) throws IOException {
 		// TODO Auto-generated method stub
+		long sz=dis.readLong();
+		System.out.println ("File Size: "+sz+" B");
+
+		byte buffer[]=new byte [1024];
+		System.out.println("Receving file..");
+		File f=new File(path);
+		FileOutputStream fos=new FileOutputStream(f);
+		if(!f.exists()){
+			   f.createNewFile();
+			}
+		long bytesRead;
+		do
+		{
+			bytesRead = dis.read(buffer, 0, buffer.length);
+			fos.write(buffer,0,buffer.length);
+			System.out.println(buffer.toString());
+		}while(!(bytesRead<1024));
+		dos.writeInt(1);
+		dos.flush();
+		System.out.println("Completed");
+		fos.close(); 
 		
 	}
 	public static void main(String[] args) {
