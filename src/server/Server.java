@@ -15,8 +15,6 @@ public class Server {
 			serverSocket=new ServerSocket();
 			InetSocketAddress sa=new InetSocketAddress("127.0.0.1",9999);
 			serverSocket.bind(sa,5);
-			startServer();
-			System.out.println("Server started");
 			
 		} catch (IOException e) {
 			System.out.println("can't create server socket");
@@ -25,13 +23,13 @@ public class Server {
 		}
 	}
 	
-	private void startServer(){
+	private void startServer(String path){
 		Socket cs=null;
 		while(true){
 			try {
 				cs=serverSocket.accept();
 				if(cs!=null){
-					FileSync fs=new FileSync(cs);
+					FileSync fs=new FileSync(cs,path);
 					fs.start();
 				}
 			} catch (IOException e) {
@@ -41,8 +39,11 @@ public class Server {
 		}
 	}
 	public static void main(String[] args) {
+		if(args.length<1){
+			System.out.println("invalid arguments \n1=path to dir");
+		}
 		Server s=new Server();
-		s.startServer();
+		s.startServer(args[0]);
 	}
 
 }

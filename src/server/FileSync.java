@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.swing.text.DateFormatter;
 
 import utils.FilesReader;
 //1 resend file
@@ -27,12 +25,13 @@ public class FileSync extends Thread {
 	private Socket cs;
 	private Map<String, Long> serverfiles = new HashMap<String, Long>();
 	private Map<String, Long> clientFiles = new HashMap<String, Long>();
-	private String pathToDir="C:\\Users\\Mahag\\workspace\\TCP-synchronizer\\src\\resources\\server";
+	private String pathToDir = "C:\\Users\\Mahag\\workspace\\TCP-synchronizer\\src\\resources\\server";
 	private Map<String, Integer> toSendFiles = new HashMap<String, Integer>();
 	private FilesReader fr = new FilesReader(pathToDir);
 
-	public FileSync(Socket cs) {
+	public FileSync(Socket cs, String path) {
 		this.cs = cs;
+		pathToDir=path;
 		try {
 			outputStream = cs.getOutputStream();
 			inputStream = cs.getInputStream();
@@ -44,7 +43,6 @@ public class FileSync extends Thread {
 	public void run() {
 		DataOutputStream dos = new DataOutputStream(outputStream);
 		DataInputStream dis = new DataInputStream(inputStream);
-		// while (true) {
 		try {
 			String date = dis.readUTF();
 			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy - hh:mm:ss");
@@ -87,7 +85,7 @@ public class FileSync extends Thread {
 			}
 			toSendFiles.size();
 			System.out.println(toSendFiles);
-			sendResultToClient(dos,dis, toSendFiles);
+			sendResultToClient(dos, dis, toSendFiles);
 			dos.close();
 			dis.close();
 		} catch (Exception e) {
@@ -98,15 +96,15 @@ public class FileSync extends Thread {
 
 	}
 
-	private void sendResultToClient(DataOutputStream dos,DataInputStream dis, Map<String, Integer> toSendFiles) throws IOException {
+	private void sendResultToClient(DataOutputStream dos, DataInputStream dis, Map<String, Integer> toSendFiles)
+			throws IOException {
 		dos.writeInt(toSendFiles.size());
 		for (Entry<String, Integer> file : toSendFiles.entrySet()) {
 			dos.writeUTF(file.getKey());
-			dos.flush();
 			Integer i = file.getValue();
 			dos.writeInt(i);
 			if (i == 1) {
-				sendFile(dos,dis, file.getKey());
+				sendFile(dos, dis, file.getKey());
 			}
 		}
 	}
@@ -114,29 +112,22 @@ public class FileSync extends Thread {
 	private void sendFile(DataOutputStream dout, DataInputStream dis, String path) throws IOException {
 		// TODO Auto-generated method stub
 
-		File f = new File(pathToDir+path);
+		File f = new File(pathToDir + path);
 		FileInputStream fin = new FileInputStream(f);
-		long sz =  f.length();
+		long sz = f.length();
 
 		byte b[] = new byte[1024];
 
 		int read;
 
 		dout.writeLong(sz);
-		dout.flush();
 
-		while ((read = fin.read(b)) != -1) {
+		while (sz > 0 && (read = fin.read(b, 0, (int) Math.min(b.length, sz))) != -1) {
 			dout.write(b, 0, read);
-			dout.flush();
+			sz -= read;
 		}
 		fin.close();
-		
-		System.out.println("..ok");
-		System.out.println(dis.readInt());
 
-		//dout.writeUTF("stop");
-		System.out.println("Send Complete");
-		dout.flush();
 	}
 
 }

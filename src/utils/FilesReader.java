@@ -11,11 +11,7 @@ public class FilesReader {
 		this.path=path;
 	}
 	
-	public static void main (String args[]) {
 
-		FilesReader fr=new FilesReader("C:\\Users\\Mahag\\workspace\\TCP-synchronizer\\src\\resources");
-		fr.getFilesList();
-	}
 	
 	public static void displayIt(File node){
 		
