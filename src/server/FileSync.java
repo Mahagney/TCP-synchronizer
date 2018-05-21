@@ -25,13 +25,14 @@ public class FileSync extends Thread {
 	private Socket cs;
 	private Map<String, Long> serverfiles = new HashMap<String, Long>();
 	private Map<String, Long> clientFiles = new HashMap<String, Long>();
-	private String pathToDir = "C:\\Users\\Mahag\\workspace\\TCP-synchronizer\\src\\resources\\server";
+	private String pathToDir;
 	private Map<String, Integer> toSendFiles = new HashMap<String, Integer>();
-	private FilesReader fr = new FilesReader(pathToDir);
+	private FilesReader fr ;
 
-	public FileSync(Socket cs, String path) {
-		this.cs = cs;
+	public FileSync(Socket cs1, String path) {
+		this.cs = cs1;
 		pathToDir=path;
+		fr= new FilesReader(pathToDir);
 		try {
 			outputStream = cs.getOutputStream();
 			inputStream = cs.getInputStream();
@@ -46,7 +47,7 @@ public class FileSync extends Thread {
 		try {
 			String date = dis.readUTF();
 			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy - hh:mm:ss");
-			Date lastSync = new Date();
+			Date lastSync = formatter.parse(date);
 			int size = dis.readInt();
 			String path;
 			long dim;
@@ -67,10 +68,7 @@ public class FileSync extends Thread {
 					} else {
 						File f = new File(filePath);
 						Long lastModified = f.lastModified();
-						SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - hh:mm:ss");
 						Date lm = new Date(lastModified);
-						String format = dateFormat.format(lm);
-						Date lastMod = dateFormat.parse(format);
 						if (lm.after(lastSync)) {
 							toSendFiles.put(filePath, 1);
 						}
@@ -89,10 +87,8 @@ public class FileSync extends Thread {
 			dos.close();
 			dis.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		// }
 
 	}
 

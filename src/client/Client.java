@@ -19,16 +19,16 @@ import utils.FilesReader;
 
 public class Client extends Thread {
 	Socket cs;
-	private String pathToDir = "C:\\Users\\Mahag\\workspace\\TCP-synchronizer\\src\\resources\\client";
+	private String pathToDir; //= "C:\\Users\\Mahag\\workspace\\TCP-synchronizer\\src\\resources\\client";
 	OutputStream outputStream;
 	InputStream inputStream;
 	Date lastSync;
 	private SimpleDateFormat simpleDateFormat;
 
-	public Client(String path, String adr) {
+	public Client(String path, String adr,int port) {
 		pathToDir = path;
 		cs = new Socket();
-		InetSocketAddress sa = new InetSocketAddress(adr, 9999);
+		InetSocketAddress sa = new InetSocketAddress(adr, port);
 		simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy - hh:mm:ss");
 		try {
 			lastSync = simpleDateFormat.parse("15/05/2018 - 00:00:00");
@@ -66,7 +66,6 @@ public class Client extends Thread {
 			try {
 				lastSync = simpleDateFormat.parse(date);
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} catch (IOException e) {
@@ -119,12 +118,12 @@ public class Client extends Thread {
 	}
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		if (args.length < 2) {
-			System.out.println("invalid arguments \n 1=server address\n2=path to dir");
+		if (args.length < 3) {
+			System.out.println("invalid arguments \n 1=server address\n2=path to dir\n3=port");
 			return;
 		}
-		Client c = new Client(args[0], args[1]);
+		int i=Integer.parseInt(args[2]);
+		Client c = new Client(args[0], args[1],i);
 		c.start();
 	}
 

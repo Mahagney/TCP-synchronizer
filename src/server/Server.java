@@ -10,10 +10,10 @@ public class Server {
 
 
 	private ServerSocket serverSocket;
-	public Server(){
+	public Server(String adr,int port){
 		try {
 			serverSocket=new ServerSocket();
-			InetSocketAddress sa=new InetSocketAddress("127.0.0.1",9999);
+			InetSocketAddress sa=new InetSocketAddress(adr,port);
 			serverSocket.bind(sa,5);
 			
 		} catch (IOException e) {
@@ -39,10 +39,11 @@ public class Server {
 		}
 	}
 	public static void main(String[] args) {
-		if(args.length<1){
-			System.out.println("invalid arguments \n1=path to dir");
+		if(args.length<2){
+			System.out.println("invalid arguments \n1=path to dir\2=address\n3=port");
 		}
-		Server s=new Server();
+		int i=Integer.parseInt(args[2]);
+		Server s=new Server(args[1],i);
 		s.startServer(args[0]);
 	}
 

@@ -31,7 +31,6 @@ public class FilesReader {
 	public Map<String,Long> getFilesList(File node){
 		Map<String,Long> files=new HashMap<String,Long>();
 		String fp=node.getAbsolutePath();
-		int i=fp.indexOf(path);
 		String relativePath=fp.substring(path.length());
 		if(node.isDirectory()){
 			String[] subNote = node.list();
